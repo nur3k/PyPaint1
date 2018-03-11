@@ -115,6 +115,4 @@ class Meenu:
 
 
 Meenu()
-print('Proba mikrofonu')
-print('Kolejna proba')
 
