@@ -7,19 +7,21 @@ import time
 
 class Meenu:
     coloursDictionaryValues = {pygame.K_UP: 'BLUE', pygame.K_LEFT: 'RED', pygame.K_RIGHT: 'WHITE'}
+    brushTypeSelection = {pygame.K_c: 'CIRCLE', pygame.K_s: 'CROSS', pygame.K_SPACE: 'SQUARE', pygame.K_d: 'DOT'}
     color = 'RED'
     image_local = 'C:\\Users\\214896\\Pictures\\kot.jpg'
+    brushtype = 'DOT'
 
     def __init__(self, x=500, y=600):
         self.window = pygame.display.set_mode((x, y))
-        self.brushThickness = 300
+        self.brushThickness = 20
         pygame.display.set_caption('PaintBeta')
         loadedimage = pygame.image.load(self.image_local)
         screen = pygame.display.get_surface()
         screen.blit(loadedimage, (0, 0))
         pygame.display.flip()
         while True:
-            self.input2()
+            self.input2
 
     @staticmethod
     def declarecolour(colour):
@@ -38,8 +40,36 @@ class Meenu:
                 self.color = v
         return 0
 
+    def change_brush_type(self, event):
+        for k, v in self.brushTypeSelection.items():
+            if event == k:
+                self.brushtype = v
+        return 0
+
+    def adjustbrush(self, event):
+        if event == 4:
+            self.brushThickness = self.brushThickness + 1
+        elif event == 5:
+            if not self.brushThickness < 3:
+                self.brushThickness = self.brushThickness - 1
+
+    def brush(self):
+        if self.brushtype == 'SQUARE':
+            self.create_square(self.brushThickness)
+        elif self.brushtype == 'CROSS':
+            self.create_cross(self.brushThickness)
+        elif self.brushtype == 'CIRCLE':
+            self.create_circle(self.brushThickness)
+        elif self.brushtype == 'DOT':
+            self.create_dot()
+        pygame.display.update()
+
     def choosecolourbox(self):
         pass
+
+    def create_dot(self):
+        x, y = pygame.mouse.get_pos()
+        self.window.set_at((x, y), (self.declarecolour(self.color)))
 
     def create_cross(self, brush=20):
         x, y = pygame.mouse.get_pos()
@@ -69,8 +99,6 @@ class Meenu:
         err = dx - (radius << 1)
         while x >= y:
             self.window.set_at((x0 + x, y0 + y), (self.declarecolour(self.color)))
-            time.sleep(0.08)
-            pygame.display.update()
             self.window.set_at((x0 + y, y0 + x), (self.declarecolour(self.color)))
             self.window.set_at((x0 - y, y0 + x), (self.declarecolour(self.color)))
             self.window.set_at((x0 - x, y0 + y), (self.declarecolour(self.color)))
@@ -90,27 +118,22 @@ class Meenu:
 
     def input2(self):
         for event in pygame.event.get():
-            # print(event)
+            print(event)
             if event.type == QUIT:
                 sys.exit(0)
-            elif pygame.mouse.get_pressed()[0]:
-                x, y = pygame.mouse.get_pos()
-                self.window.set_at((x, y), (self.declarecolour(self.color)))
-                pygame.display.update()
-            elif pygame.key.get_pressed()[K_SPACE]:
-                self.create_square(self.brushThickness)
-            elif pygame.key.get_pressed()[K_s]:
-                self.create_cross(self.brushThickness)
-            elif pygame.key.get_pressed()[K_c]:
-                self.create_circle(self.brushThickness)
-            elif pygame.key.get_pressed()[K_EQUALS]:
-                self.brushThickness = self.brushThickness + 1
-            elif pygame.key.get_pressed()[K_MINUS]:
-                if not self.brushThickness < 3:
-                    self.brushThickness = self.brushThickness - 1
-            elif event.type == KEYDOWN:
+            if pygame.mouse.get_pressed()[0]:
+                # mouse button holding:
+                self.brush()
+            if event.type == KEYDOWN:
+                # clicking keyboards button
                 # coloursDictionaryValues. Change color by arrows
                 self.change_color(event.key)
+                # change brush type by clicking SPACE/C/S/D
+                self.change_brush_type(event.key)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # clicking mouse button
+                # adjust size of the brush by scrolling the wheel
+                self.adjustbrush(event.button)
         return 0
 
 
