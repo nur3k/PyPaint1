@@ -115,5 +115,5 @@ class Meenu:
 
 
 Meenu()
-#print(Meenu.create_circle(255, 255, 10))
+print('Proba mikrofonu')
 
