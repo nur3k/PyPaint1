@@ -1,27 +1,26 @@
 import pygame
-import sys
 from pygame.locals import *
 from tkinter import *
 import time
 
-
 class Meenu:
     coloursDictionaryValues = {pygame.K_UP: 'BLUE', pygame.K_LEFT: 'RED', pygame.K_RIGHT: 'WHITE'}
-    brushTypeSelection = {pygame.K_c: 'CIRCLE', pygame.K_s: 'CROSS', pygame.K_SPACE: 'SQUARE', pygame.K_d: 'DOT'}
+    brushTypeSelection = {pygame.K_c: 'CIRCLE', pygame.K_s: 'CROSS', pygame.K_SPACE: 'SQUARE', pygame.K_d: 'DOT',
+                          pygame.K_e: 'EMPTYSQUARE', pygame.K_a: 'CIRCLEAA'}
     color = 'RED'
-    image_local = 'C:\\Users\\214896\\Pictures\\kot.jpg'
     brushtype = 'DOT'
+    image_local = 'C:\\Users\\214896\\Pictures\\kot.jpg'
+    brushThickness = 50
 
     def __init__(self, x=500, y=600):
         self.window = pygame.display.set_mode((x, y))
-        self.brushThickness = 20
         pygame.display.set_caption('PaintBeta')
-        loadedimage = pygame.image.load(self.image_local)
+        # loadedimage = pygame.image.load(self.image_local)
         screen = pygame.display.get_surface()
-        screen.blit(loadedimage, (0, 0))
+        # screen.blit(loadedimage, (0, 0))
         pygame.display.flip()
         while True:
-            self.input2
+            self.input2()
 
     @staticmethod
     def declarecolour(colour):
@@ -59,9 +58,13 @@ class Meenu:
         elif self.brushtype == 'CROSS':
             self.create_cross(self.brushThickness)
         elif self.brushtype == 'CIRCLE':
-            self.create_circle(self.brushThickness)
+            self.create_ring(self.brushThickness)
         elif self.brushtype == 'DOT':
             self.create_dot()
+        elif self.brushtype == 'EMPTYSQUARE':
+            self.create_empty_square(self.brushThickness)
+        elif self.brushtype == 'CIRCLEAA':
+            self.create_circle(self.brushThickness)
         pygame.display.update()
 
     def choosecolourbox(self):
@@ -85,13 +88,25 @@ class Meenu:
     def create_square(self, brush=20):
         x, y = pygame.mouse.get_pos()
         brush = int(brush/2)
-        for xx in range(-brush, brush):
-            for yy in range(-brush, brush):
+        for xx in range(-brush, brush+1):
+            for yy in range(-brush, brush+1):
                 self.window.set_at((x + xx, y + yy), (self.declarecolour(self.color)))
         pygame.display.update()
         return 0
 
-    def create_circle(self, radius=20):
+    def create_empty_square(self, brush=20):
+        x, y = pygame.mouse.get_pos()
+        brush = int(brush/2)
+        for xx in range(-brush, brush+1):
+            for yy in range(-brush, brush+1):
+                if yy == -brush or yy == brush:
+                    self.window.set_at((x + xx, y + yy), (self.declarecolour(self.color)))
+                if xx == -brush or xx == brush:
+                    self.window.set_at((x + xx, y + yy), (self.declarecolour(self.color)))
+        pygame.display.update()
+        return 0
+
+    def create_ring(self, radius=20):
         radius = int(radius / 2)
         x0, y0 = pygame.mouse.get_pos()
         dx, dy = 1, 1
@@ -116,6 +131,10 @@ class Meenu:
                 err = err + dx - (radius << 1)
         pygame.display.update()
 
+    def create_circle(self, radius=20):
+        for i in range(1, radius+1):
+            self.create_ring(i)
+
     def input2(self):
         for event in pygame.event.get():
             print(event)
@@ -137,5 +156,5 @@ class Meenu:
         return 0
 
 
-Meenu()
+Meenu(900, 900)
 
