@@ -2,11 +2,13 @@ import pygame
 from pygame.locals import *
 from tkinter import *
 import time
+import math
 
 class Meenu:
     coloursDictionaryValues = {pygame.K_UP: 'BLUE', pygame.K_LEFT: 'RED', pygame.K_RIGHT: 'WHITE'}
-    brushTypeSelection = {pygame.K_c: 'CIRCLE', pygame.K_s: 'CROSS', pygame.K_SPACE: 'SQUARE', pygame.K_d: 'DOT',
-                          pygame.K_e: 'EMPTYSQUARE', pygame.K_a: 'CIRCLEAA'}
+    brushTypeSelection = {pygame.K_q: 'CIRCLE', pygame.K_SPACE: 'CROSS', pygame.K_a: 'SQUARE',
+                          pygame.K_s: 'SQUARE_FILLED', pygame.K_e: 'EMPTYSQUARE', pygame.K_w: 'CIRCLE_FILLED',
+                          pygame.K_z: 'DOT'}
     color = 'RED'
     brushtype = 'DOT'
     image_local = 'C:\\Users\\214896\\Pictures\\kot.jpg'
@@ -22,9 +24,8 @@ class Meenu:
         while True:
             self.input2()
 
-    @staticmethod
-    def declarecolour(colour):
-        coltmp = (0, 0, 0)
+    def declarecolour(self, colour):
+        #coltmp = (0, 0, 0)
         if colour == 'RED':
             coltmp = (255, 0, 0)
         elif colour == 'WHITE':
@@ -53,18 +54,18 @@ class Meenu:
                 self.brushThickness = self.brushThickness - 1
 
     def brush(self):
-        if self.brushtype == 'SQUARE':
+        if self.brushtype == 'SQUARE_FILLED':
             self.create_square(self.brushThickness)
         elif self.brushtype == 'CROSS':
             self.create_cross(self.brushThickness)
         elif self.brushtype == 'CIRCLE':
-            self.create_ring(self.brushThickness)
+            self.draw_circle(self.brushThickness)
         elif self.brushtype == 'DOT':
             self.create_dot()
-        elif self.brushtype == 'EMPTYSQUARE':
+        elif self.brushtype == 'SQUARE':
             self.create_empty_square(self.brushThickness)
-        elif self.brushtype == 'CIRCLEAA':
-            self.create_circle(self.brushThickness)
+        elif self.brushtype == 'CIRCLE_FILLED':
+            self.draw_circlefilled(self.brushThickness)
         pygame.display.update()
 
     def choosecolourbox(self):
@@ -82,7 +83,6 @@ class Meenu:
             self.window.set_at((x + value, y - value), (self.declarecolour(self.color)))
             self.window.set_at((x, y + value), (self.declarecolour(self.color)))
             self.window.set_at((x + value, y), (self.declarecolour(self.color)))
-        pygame.display.update()
         return 0
 
     def create_square(self, brush=20):
@@ -91,7 +91,6 @@ class Meenu:
         for xx in range(-brush, brush+1):
             for yy in range(-brush, brush+1):
                 self.window.set_at((x + xx, y + yy), (self.declarecolour(self.color)))
-        pygame.display.update()
         return 0
 
     def create_empty_square(self, brush=20):
@@ -103,8 +102,9 @@ class Meenu:
                     self.window.set_at((x + xx, y + yy), (self.declarecolour(self.color)))
                 if xx == -brush or xx == brush:
                     self.window.set_at((x + xx, y + yy), (self.declarecolour(self.color)))
-        pygame.display.update()
         return 0
+
+    # wiki alhorithm
 
     def create_ring(self, radius=20):
         radius = int(radius / 2)
@@ -129,11 +129,28 @@ class Meenu:
                 x = x - 1
                 dx = dx + 2
                 err = err + dx - (radius << 1)
-        pygame.display.update()
 
-    def create_circle(self, radius=20):
-        for i in range(1, radius+1):
+    def create_ringfilled(self, radius=20):
+        for i in range(0, radius):
             self.create_ring(i)
+    #
+    # SIN COS Algorithm
+
+    def draw_circle(self, radius=20):
+        length = int(radius / 2)
+        x1, y1 = pygame.mouse.get_pos()
+        angle = 0.0
+        angle_stepsize = 0.1
+        while angle < 2 * math.pi:
+            x = length * math.cos(angle)
+            y = length * math.sin(angle)
+            self.window.set_at((int(x + x1), int(y + y1)), (self.declarecolour(self.color)))
+            angle = angle + angle_stepsize
+
+    def draw_circlefilled(self, radius=20):
+        for i in range(0, radius):
+            self.draw_circle(i)
+    #
 
     def input2(self):
         for event in pygame.event.get():
